@@ -1,1 +1,1 @@
-web: gunicorn dashapp:app --log-file=-
+web: gunicorn app:server
