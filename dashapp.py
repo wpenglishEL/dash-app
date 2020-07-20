@@ -165,4 +165,4 @@ def enter_word(
     return False
 
 if __name__ == '__main__':
-    app.run_server(port=8888, host='0.0.0.0', debug=False)
+    app.run_server(debug=False)
