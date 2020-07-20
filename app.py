@@ -1,22 +1,168 @@
+import datetime
+import argparse
+import logging
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
+import dash_table
+import pandas as pd
+import plotly
+from dash.dependencies import Input, Output
+from flask import send_file
+ 
+logging.basicConfig(
+    format="%(levelname)s - %(asctime)s - %(message)s",
+    level=logging.DEBUG
+)
+ 
+external_stylesheets = external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+	 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-
 server = app.server
+ 
+app.config.update({
+    'routes_pathname_prefix': './',
+    'requests_pathname_prefix': './'
+})
 
-top_markdown_text = '''
-This is my first deployed app
-'''
+symptom_list=["fever", "cough", "muscle aches", "shortness of breath", "fatigue",
+              "loss of taste or smell", "headache", "congestion", "nausea"]
+app.layout = html.Div(children=[
+    html.Img(
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Eli_Lilly_and_Company.svg/1200px-Eli_Lilly_and_Company.svg.png",
+        style={
+            'height': 40,
+            'width': 70,
+        }
+        ),
+    html.H1("COVID-19 Check-In"),
+    html.H3("At Eli Lilly and Company, we care about your well-being. \n Please "+
+            "answer a few questions for us to determine your next steps \n "+
+            "during these tough times."),
+    # this div below is to track the button status - is it running a
+    # function, is it done, when should we disable the button?
+    html.Div(id='trigger', children=0, style=dict(display="none")),
+    html.Br(),
+    html.Div(id='questionnaire', children=[
+        html.Div(id='name_input', children=
+            dcc.Input(
+                id="user_name",
+                placeholder="Enter your name here...",
+                type="text",
+                size="50",
+                required=True)
+        ),
+        html.Br(),
+        html.Div(id='temperature_input', children=
+            dcc.Input(
+                id="temperature",
+                placeholder="Enter your current body temperature...",
+                type="number",
+                size="50",
+                required=True)
+        ),
+        html.Br(),
+        html.Div(id="symptom_select", children=
+            dcc.Dropdown(id='symptoms', placeholder='Select Applicable Symptoms...', 
+                        multi=True, options=[{'label': i, 'value': i} for i in symptom_list])
+        ),
+        html.Br(),
+        html.Div(id='feeling_rating_input', children=
+            dcc.Input(
+                id="feeling_rating",
+                placeholder="Enter your rating...",
+                type="number",
+                size="50",
+                min=1,
+                max=10,
+                required=True)
+        ),
+        html.Br(),
+        html.Div(id='water_intake_input', children=
+            dcc.Input(
+                id="water_intake",
+                placeholder="Enter your water intake in ounces...",
+                type="number",
+                size="50",
+                min=1,
+                required=True)
+        ),
+        html.Br(),
+        html.Div(id='soup_input', children=
+            dcc.Input(
+                id="soup",
+                placeholder="Enter a kind of soup...",
+                type="text",
+                size="50",
+                required=True)
+        ),
+    ]
+    ),
+    html.Br(),
+    dcc.Markdown('**Click to submit** - please wait a moment for a response',
+               id='submit-label'),
+    html.Button('Submit', id='button', disabled=False),
+    html.Div(id='input_return', hidden=True),
+    dcc.Store(id='data_entered', data=False),
+    html.Div("Everything has been stored correctly.", id="success_message", hidden=True)
+]
+)
 
-app.layout = html.Div([
+@app.callback(
+    dash.dependencies.Output("button", "disabled"),
+    [dash.dependencies.Input("button", "n_clicks"),
+     dash.dependencies.Input("trigger", "children")]
+)
+def trigger_function(n_clicks, trigger):
+    context = dash.callback_context.triggered[0]['prop_id'].split('.')[0]
+    if context == "button":
+        # only if the button clicked do we consider disabling
+        if n_clicks and n_clicks > 0:
+            # let's immediately disable if it was clicked
+            return True
+        else:
+            # don't disable on startup
+            return False
+    else:
+        # on startup or something else triggered besides the button,
+        # don't disable
+        return False
 
-    dcc.Markdown(children=top_markdown_text),
-
-])
+@app.callback(
+    dash.dependencies.Output('success_message', "hidden"),
+    [dash.dependencies.Input('button', 'n_clicks')],
+    # this list below will create the ordered args into our callback to
+    # collect all the form inputs
+    [dash.dependencies.State("user_name", "value"),
+     dash.dependencies.State("temperature", "value"),
+     dash.dependencies.State("symptoms", "value"),
+     dash.dependencies.State("feeling_rating", "value"),
+     dash.dependencies.State("water_intake", "value"),
+     dash.dependencies.State("soup", "value")]
+)
+def enter_word(
+        n_clicks,
+        user_name,
+        temperature,
+        symptoms,
+        feeling_rating,
+        water_intake,
+        soup
+        ):
+    if not n_clicks or n_clicks == 0:
+        # don't return anything initially
+        return True
+    required_inputs = {
+        "required_singletons": {
+            "User Name": user_name,
+            "Temperature": temperature,
+            "Symptoms": symptoms,
+            "Feeling Rating": feeling_rating,
+            "Water Intake": water_intake,
+            "Soup": soup
+        }
+    }
+    return False
 
 if __name__ == '__main__':
     app.run_server(debug=True)
