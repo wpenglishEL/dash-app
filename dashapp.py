@@ -165,4 +165,7 @@ def enter_word(
     return False
 
 if __name__ == '__main__':
-    app.run_server(host='0.0.0.0', port='8998')
+	if 'DYNO' in os.environ:
+		app.run_server(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+	else:
+		app.run_server(host='localhost', port=8888, debug=True)
