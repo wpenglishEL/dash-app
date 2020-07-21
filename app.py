@@ -46,6 +46,7 @@ app.layout = html.Div(children=[
     html.Div(id='trigger', children=0, style=dict(display="none")),
     html.Div(id='return_user_trigger', children=0, style=dict(display="none")),
     html.Button('I am a Returning User', id='return_user_button', disabled=False),
+    html.Div("Welcome Back!", id='welcome_back_message', hidden=True),
     html.Br(),
     html.Div(id='questionnaire', children=[
         html.H5("What is your name?"),
@@ -111,7 +112,7 @@ app.layout = html.Div(children=[
     html.Br(),
     dcc.Markdown('**Click to submit** - please wait a moment for a response',
                id='submit-label'),
-    html.Button('Submit', id='button', disabled=False),
+    html.Button('Submit', id='button', disabled=False, style={'BackgroundColor':'white'}),
     html.Div(id='input_return', hidden=True),
     dcc.Store(id='data_entered', data=False),
     html.Div("Everything has been stored correctly.", id="success_message", hidden=True),
@@ -162,14 +163,15 @@ def trigger_function(n_clicks, return_user_trigger):
         return False
 
 @app.callback(
-    dash.dependencies.Output('is_returning_user', "data"),
-    [dash.dependencies.Input('button', 'n_clicks')]
+    [dash.dependencies.Output('is_returning_user', "data"),
+     dash.dependencies.Output('welcome_back_message', "hidden")],
+    [dash.dependencies.Input('return_user_button', 'n_clicks')]
 )
 def return_user(n_clicks):
     if not n_clicks or n_clicks == 0:
         # don't return anything initially
-        return False
-    return True
+        return False, True
+    return True, False
 
 @app.callback(
     [dash.dependencies.Output('success_message', "hidden"),
