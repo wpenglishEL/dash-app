@@ -233,7 +233,10 @@ def generate_results(
         soup
         ):
     if display_results:
-        print(user_name)
+        token = "7aef34ec59f728928d7a798d5a9c5c9dc4abc7d9"
+        repo = "wpenglish/trackingJSON"
+        g = Github(token)
+        repo = g.get_repo(repo)
         if is_returning_user:
             contents = repo.get_contents(user_name + ".json")
             person = json.loads(contents.decoded_content)
