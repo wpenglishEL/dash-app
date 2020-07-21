@@ -9,7 +9,7 @@ import pandas as pd
 import plotly
 from dash.dependencies import Input, Output
 from flask import send_file
-#from github import Github
+from github import Github
 import json
  
 logging.basicConfig(
