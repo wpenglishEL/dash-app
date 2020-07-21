@@ -239,7 +239,7 @@ def generate_results(
         repo = g.get_repo(repo)
         data_set = {"name": user_name, "temp": [temperature], "symptoms":[symptoms], "rating":[feeling_rating], "water_intake": [water_intake], "Soup":[soup]}
         json_dump = json.dumps(data_set)
-        repo.create_file(user_name + ".json", user_name + " data", json_dump)
+        repo.create_file("heroku.txt", "test", "data")
         return html.P("")
 
 if __name__ == '__main__':
