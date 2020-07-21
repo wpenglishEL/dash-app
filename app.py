@@ -44,6 +44,7 @@ app.layout = html.Div(children=[
     html.Div(id='trigger', children=0, style=dict(display="none")),
     html.Br(),
     html.Div(id='questionnaire', children=[
+        html.H5("What is your name?"),
         html.Div(id='name_input', children=
             dcc.Input(
                 id="user_name",
@@ -53,6 +54,7 @@ app.layout = html.Div(children=[
                 required=True)
         ),
         html.Br(),
+        html.H5("What is your current body temperature?"),
         html.Div(id='temperature_input', children=
             dcc.Input(
                 id="temperature",
@@ -62,11 +64,13 @@ app.layout = html.Div(children=[
                 required=True)
         ),
         html.Br(),
+        html.H5("What are your current symptoms? Select from dropdown below."),
         html.Div(id="symptom_select", children=
             dcc.Dropdown(id='symptoms', placeholder='Select Applicable Symptoms...', 
                         multi=True, options=[{'label': i, 'value': i} for i in symptom_list])
         ),
         html.Br(),
+        html.H5("How well are you feeling? Select 1 for extremely sick and 10 for a near full recovery."),
         html.Div(id='feeling_rating_input', children=
             dcc.Input(
                 id="feeling_rating",
@@ -78,6 +82,7 @@ app.layout = html.Div(children=[
                 required=True)
         ),
         html.Br(),
+        html.H5("How many fluid ounces of water have you had today?"),
         html.Div(id='water_intake_input', children=
             dcc.Input(
                 id="water_intake",
@@ -88,6 +93,7 @@ app.layout = html.Div(children=[
                 required=True)
         ),
         html.Br(),
+        html.H5("What type of soup would you like?"),
         html.Div(id='soup_input', children=
             dcc.Input(
                 id="soup",
@@ -104,7 +110,9 @@ app.layout = html.Div(children=[
     html.Button('Submit', id='button', disabled=False),
     html.Div(id='input_return', hidden=True),
     dcc.Store(id='data_entered', data=False),
-    html.Div("Everything has been stored correctly.", id="success_message", hidden=True)
+    html.Div("Everything has been stored correctly.", id="success_message", hidden=True),
+    dcc.Store(id="display_results", data=False),
+    html.Div(id='results', hidden=True),
 ]
 )
 
@@ -129,7 +137,9 @@ def trigger_function(n_clicks, trigger):
         return False
 
 @app.callback(
-    dash.dependencies.Output('success_message', "hidden"),
+    [dash.dependencies.Output('success_message', "hidden"),
+     dash.dependencies.Output('display_results', "data"),
+     dash.dependencies.Output('results', "hidden")],
     [dash.dependencies.Input('button', 'n_clicks')],
     # this list below will create the ordered args into our callback to
     # collect all the form inputs
@@ -151,7 +161,7 @@ def enter_word(
         ):
     if not n_clicks or n_clicks == 0:
         # don't return anything initially
-        return True
+        return True, False, True
     required_inputs = {
         "required_singletons": {
             "User Name": user_name,
@@ -162,7 +172,32 @@ def enter_word(
             "Soup": soup
         }
     }
-    return False
+    return False, True, False
+
+@app.callback(
+    dash.dependencies.Output('results', "children"),
+    [dash.dependencies.Input('display_results', 'data')],
+    # this list below will create the ordered args into our callback to
+    # collect all the form inputs
+    [dash.dependencies.State("user_name", "value"),
+     dash.dependencies.State("temperature", "value"),
+     dash.dependencies.State("symptoms", "value"),
+     dash.dependencies.State("feeling_rating", "value"),
+     dash.dependencies.State("water_intake", "value"),
+     dash.dependencies.State("soup", "value")]
+)
+def generate_results(
+        display_results,
+        user_name,
+        temperature,
+        symptoms,
+        feeling_rating,
+        water_intake,
+        soup
+        ):
+    if display_results:
+        print(user_name)
+        return html.P("")
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(port=8888, host='0.0.0.0', debug=True)
