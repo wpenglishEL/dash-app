@@ -237,11 +237,10 @@ def generate_results(
         repo = "wpenglish/trackingJSON"
         g = Github("730b20add" + "112f61ecc5" + "b89fa43fd" + "d8123fb4bb44")
         repo = g.get_repo(repo)
-	print(repo.name)
+        print(repo.name)
         data_set = {"name": user_name, "temp": [temperature], "symptoms":[symptoms], "rating":[feeling_rating], "water_intake": [water_intake], "Soup":[soup]}
         json_dump = json.dumps(data_set)
         repo.create_file("heroku.txt", "test", "data")
-	
         return html.P(repo.name)
 
 if __name__ == '__main__':
