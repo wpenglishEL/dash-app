@@ -9,7 +9,7 @@ import pandas as pd
 import plotly
 from dash.dependencies import Input, Output
 from flask import send_file
-from github import Github
+#from github import Github
 import json
  
 logging.basicConfig(
@@ -41,19 +41,22 @@ app.layout = html.Div(children=[
     html.H3("At Eli Lilly and Company, we care about your well-being. \n Please "+
             "answer a few questions for us to determine your next steps \n "+
             "during these tough times."),
+    html.H5("To help with results tracking, we ask that you come up with a unique username. "+
+            "make sure that your username contains both letters and numbers (no special characters) "+
+            "and is at least 8 digits long."),
     # this div below is to track the button status - is it running a
     # function, is it done, when should we disable the button?
     html.Div(id='trigger', children=0, style=dict(display="none")),
     html.Div(id='return_user_trigger', children=0, style=dict(display="none")),
     html.Button('I am a Returning User', id='return_user_button', disabled=False),
-    html.Div("Welcome Back!", id='welcome_back_message', hidden=True),
+    html.Div("Welcome Back! Please continue to enter your username and complete the form below.", id='welcome_back_message', hidden=True),
     html.Br(),
     html.Div(id='questionnaire', children=[
-        html.H5("What is your name?"),
+        html.H5("What is your username?"),
         html.Div(id='name_input', children=
             dcc.Input(
                 id="user_name",
-                placeholder="Enter your name here...",
+                placeholder="Enter your unique username here...",
                 type="text",
                 size="50",
                 required=True)
@@ -118,7 +121,11 @@ app.layout = html.Div(children=[
     html.Div("Everything has been stored correctly.", id="success_message", hidden=True),
     dcc.Store(id="display_results", data=False),
     dcc.Store(id="is_returning_user", data=False),
-    html.Div(id='results', hidden=True),
+    html.Div(id='view_results', hidden=True, children=
+        html.A(html.Button('Click Here to View Feedback'),
+        id='results_link'
+        ),
+    ),
 ]
 )
 
@@ -175,8 +182,7 @@ def return_user(n_clicks):
 
 @app.callback(
     [dash.dependencies.Output('success_message', "hidden"),
-     dash.dependencies.Output('display_results', "data"),
-     dash.dependencies.Output('results', "hidden")],
+     dash.dependencies.Output('display_results', "data")],
     [dash.dependencies.Input('button', 'n_clicks')],
     # this list below will create the ordered args into our callback to
     # collect all the form inputs
@@ -198,7 +204,7 @@ def enter_word(
         ):
     if not n_clicks or n_clicks == 0:
         # don't return anything initially
-        return True, False, True
+        return True, False
     required_inputs = {
         "required_singletons": {
             "User Name": user_name,
@@ -209,12 +215,13 @@ def enter_word(
             "Soup": soup
         }
     }
-    return False, True, False
+    return False, True
 
 @app.callback(
-    dash.dependencies.Output('results', "children"),
+    [dash.dependencies.Output('view_results', "hidden"),
+     dash.dependencies.Output('results_link', "href")],
     [dash.dependencies.Input('display_results', 'data'),
-     dash.dependencies.Input('is_returning_user', 'data'),],
+     dash.dependencies.Input('is_returning_user', 'data')],
     # this list below will create the ordered args into our callback to
     # collect all the form inputs
     [dash.dependencies.State("user_name", "value"),
@@ -253,7 +260,8 @@ def generate_results(
             data_set = {"name": user_name, "temp": [temperature], "symptoms":[symptoms], "rating":[feeling_rating], "water_intake": [water_intake], "soup":[soup]}
             json_dump = json.dumps(data_set)
             repo.create_file(user_name + ".json", user_name + " data", json_dump)
-        return html.P("")
+        return False, 'https://hack-tracking-app.herokuapp.com/dashboard/'+str(user_name)
+    return True, None
 
 if __name__ == '__main__':
     app.run_server(debug=True)
