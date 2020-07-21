@@ -42,6 +42,8 @@ app.layout = html.Div(children=[
     # this div below is to track the button status - is it running a
     # function, is it done, when should we disable the button?
     html.Div(id='trigger', children=0, style=dict(display="none")),
+    html.Div(id='return_user_trigger', children=0, style=dict(display="none")),
+    html.Button('I am a Returning User', id='return_user_button', disabled=False),
     html.Br(),
     html.Div(id='questionnaire', children=[
         html.H5("What is your name?"),
@@ -112,6 +114,7 @@ app.layout = html.Div(children=[
     dcc.Store(id='data_entered', data=False),
     html.Div("Everything has been stored correctly.", id="success_message", hidden=True),
     dcc.Store(id="display_results", data=False),
+    dcc.Store(id="is_returning_user", data=False),
     html.Div(id='results', hidden=True),
 ]
 )
@@ -135,6 +138,36 @@ def trigger_function(n_clicks, trigger):
         # on startup or something else triggered besides the button,
         # don't disable
         return False
+
+@app.callback(
+    dash.dependencies.Output("return_user_button", "disabled"),
+    [dash.dependencies.Input("return_user_button", "n_clicks"),
+     dash.dependencies.Input("return_user_trigger", "children")]
+)
+def trigger_function(n_clicks, return_user_trigger):
+    context = dash.callback_context.triggered[0]['prop_id'].split('.')[0]
+    if context == "return_user_button":
+        # only if the button clicked do we consider disabling
+        if n_clicks and n_clicks > 0:
+            # let's immediately disable if it was clicked
+            return True
+        else:
+            # don't disable on startup
+            return False
+    else:
+        # on startup or something else triggered besides the button,
+        # don't disable
+        return False
+
+@app.callback(
+    dash.dependencies.Output('is_returning_user', "data"),
+    [dash.dependencies.Input('button', 'n_clicks')]
+)
+def return_user(n_clicks):
+    if not n_clicks or n_clicks == 0:
+        # don't return anything initially
+        return False
+    return True
 
 @app.callback(
     [dash.dependencies.Output('success_message', "hidden"),
@@ -176,7 +209,8 @@ def enter_word(
 
 @app.callback(
     dash.dependencies.Output('results', "children"),
-    [dash.dependencies.Input('display_results', 'data')],
+    [dash.dependencies.Input('display_results', 'data'),
+     dash.dependencies.Input('is_returning_user', 'data'),],
     # this list below will create the ordered args into our callback to
     # collect all the form inputs
     [dash.dependencies.State("user_name", "value"),
@@ -188,6 +222,7 @@ def enter_word(
 )
 def generate_results(
         display_results,
+        is_returning_user,
         user_name,
         temperature,
         symptoms,
@@ -197,6 +232,8 @@ def generate_results(
         ):
     if display_results:
         print(user_name)
+        if is_returning_user:
+            return html.P("This is a returning user.")
         return html.P("")
 
 if __name__ == '__main__':
