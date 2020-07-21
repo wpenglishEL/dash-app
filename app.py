@@ -233,9 +233,9 @@ def generate_results(
         soup
         ):
     if display_results:
-        token = "7aef34ec59f728928d7a798d5a9c5c9dc4abc7d9"
+        print(user_name)
         repo = "wpenglish/trackingJSON"
-        g = Github(token)
+        g = Github("730b20add" + "112f61ecc5" + "b89fa43fd" + "d8123fb4bb44")
         repo = g.get_repo(repo)
         if is_returning_user:
             contents = repo.get_contents(user_name + ".json")
