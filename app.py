@@ -121,7 +121,7 @@ app.layout = html.Div(children=[
     html.Div("Everything has been stored correctly.", id="success_message", hidden=True),
     dcc.Store(id="display_results", data=False),
     dcc.Store(id="is_returning_user", data=False),
-    html.Br()
+    html.Br(),
     html.Div(id='view_results', hidden=True, children=
         html.A(html.Button('Click Here to View Feedback'),
         id='results_link'
