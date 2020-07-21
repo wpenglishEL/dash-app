@@ -233,7 +233,18 @@ def generate_results(
     if display_results:
         print(user_name)
         if is_returning_user:
-            return html.P("This is a returning user.")
+            contents = repo.get_contents(user_name + ".json")
+            person = json.loads(contents.decoded_content)
+            person['temp'].append(temperature)
+            person['symptoms'].append(symptoms)
+            person['rating'].append(feeling_rating)
+            person['water_intake'].append(water_intake)
+            person = json.dumps(person)
+            repo.update_file(contents.path, user_name + " data", person, contents.sha)
+        else:
+            data_set = {"name": user_name, "temp": [temperature], "symptoms":[symptoms], "rating":[feeling_rating], "water_intake": [water_intake], "Soup":[soup]}
+            json_dump = json.dumps(data_set)
+            repo.create_file(user_name + ".json", user_name + " data", json_dump)
         return html.P("")
 
 if __name__ == '__main__':
