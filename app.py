@@ -5,7 +5,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_table
-import pandas as pd
+import dash_daq as daq
 import plotly
 from dash.dependencies import Input, Output
 from flask import send_file
@@ -18,7 +18,7 @@ logging.basicConfig(
 )
  
 external_stylesheets = external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-	 
+     
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
  
@@ -239,7 +239,7 @@ def generate_results(
         repo = g.get_repo(repo)
         data_set = {"name": user_name, "temp": [temperature], "symptoms":[symptoms], "rating":[feeling_rating], "water_intake": [water_intake], "Soup":[soup]}
         json_dump = json.dumps(data_set)
-        repo.create_file("heroku.txt", "test", "data")
+        repo.create_file(user_name + ".json", user_name + " data", json_dump)
         return html.P("")
 
 if __name__ == '__main__':
