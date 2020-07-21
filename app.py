@@ -98,11 +98,11 @@ app.layout = html.Div(children=[
                 required=True)
         ),
         html.Br(),
-        html.H5("What type of soup would you like?"),
+        html.H5("Any other thoughts?"),
         html.Div(id='soup_input', children=
             dcc.Input(
                 id="soup",
-                placeholder="Enter a kind of soup...",
+                placeholder="Enter some notes...",
                 type="text",
                 size="50",
                 required=True)
@@ -246,10 +246,11 @@ def generate_results(
             person['symptoms'].append(symptoms)
             person['rating'].append(feeling_rating)
             person['water_intake'].append(water_intake)
+            person['soup'].append(soup)
             person = json.dumps(person)
             repo.update_file(contents.path, user_name + " data", person, contents.sha)
         else:
-            data_set = {"name": user_name, "temp": [temperature], "symptoms":[symptoms], "rating":[feeling_rating], "water_intake": [water_intake], "Soup":[soup]}
+            data_set = {"name": user_name, "temp": [temperature], "symptoms":[symptoms], "rating":[feeling_rating], "water_intake": [water_intake], "soup":[soup]}
             json_dump = json.dumps(data_set)
             repo.create_file(user_name + ".json", user_name + " data", json_dump)
         return html.P("")
