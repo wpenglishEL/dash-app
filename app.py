@@ -125,7 +125,7 @@ app.layout = html.Div(children=[
     html.Div("Thank you for filling out the questionnaire! \n"+
              "Keep your username in a safe place. To view your results, \n"+
              "navigate to the \"View Your Progress\" page and enter the same \n"+
-             "username you used to fill out this form." id='view_results'
+             "username you used to fill out this form.", id='view_results'
     ),
 ]
 )
