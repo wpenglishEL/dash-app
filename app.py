@@ -42,7 +42,7 @@ app.layout = html.Div(children=[
             "answer a few questions for us to determine your next steps \n "+
             "during these tough times."),
     html.H5("To help with results tracking, we ask that you come up with a unique username. "+
-            "make sure that your username contains both letters and numbers (no special characters) "+
+            "Make sure that your username contains both letters and numbers (no special characters) "+
             "and is at least 8 digits long."),
     # this div below is to track the button status - is it running a
     # function, is it done, when should we disable the button?
