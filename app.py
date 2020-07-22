@@ -91,7 +91,7 @@ app.layout = html.Div(children=[
                 required=True)
         ),
         html.Br(),
-        html.H5("How many fluid ounces of water have you had today?"),
+        html.H5("How many cups of water have you had today?"),
         html.Div(id='water_intake_input', children=
             dcc.Input(
                 id="water_intake",
