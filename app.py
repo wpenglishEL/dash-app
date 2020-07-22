@@ -122,10 +122,10 @@ app.layout = html.Div(children=[
     dcc.Store(id="display_results", data=False),
     dcc.Store(id="is_returning_user", data=False),
     html.Br(),
-    html.Div(id='view_results', hidden=True, children=
-        html.A(html.Button('Click Here to View Feedback'),
-        id='results_link'
-        ),
+    html.Div("Thank you for filling out the questionnaire! \n"+
+             "Keep your username in a safe place. To view your results, \n"+
+             "navigate to the \"View Your Progress\" page and enter the same \n"+
+             "username you used to fill out this form." id='view_results'
     ),
 ]
 )
@@ -218,8 +218,7 @@ def enter_word(
     return True
 
 @app.callback(
-    [dash.dependencies.Output('view_results', "hidden"),
-     dash.dependencies.Output('results_link', "href")],
+    dash.dependencies.Output('view_results', "hidden"),
     [dash.dependencies.Input('display_results', 'data'),
      dash.dependencies.Input('is_returning_user', 'data')],
     # this list below will create the ordered args into our callback to
@@ -262,8 +261,8 @@ def generate_results(
             data_set = {"name": user_name, "temp": [temperature], "symptoms":[symptoms], "num_sym":[num_sym], "rating":[feeling_rating], "water_intake": [water_intake], "Soup":[soup]}
             json_dump = json.dumps(data_set)
             repo.create_file(user_name + ".json", user_name + " data", json_dump)
-        return False, 'https://hack-tracking-app.herokuapp.com/dashboard/'+str(user_name)
-    return True, None
+        return False
+    return True
 
 if __name__ == '__main__':
     app.run_server(debug=True)
