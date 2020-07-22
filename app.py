@@ -255,6 +255,7 @@ def generate_results(
             person['rating'].append(feeling_rating)
             person['water_intake'].append(water_intake)
             person['num_sym'].append(num_sym)
+            person['Soup'].append(soup)
             person = json.dumps(person)
             repo.update_file(contents.path, user_name + " data", person, contents.sha)
         else:
