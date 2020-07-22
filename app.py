@@ -37,7 +37,7 @@ app.layout = html.Div(children=[
             'width': 70,
         }
         ),
-    html.H1("COVID-19 Check-In"),
+    html.H1("COVID-19 Recovery Questionnaire"),
     html.H3("At Eli Lilly and Company, we care about your well-being. \n Please "+
             "answer a few questions for us to determine your next steps \n "+
             "during these tough times."),
@@ -118,7 +118,6 @@ app.layout = html.Div(children=[
     html.Button('Submit', id='button', disabled=False, style={'BackgroundColor':'white'}),
     html.Div(id='input_return', hidden=True),
     dcc.Store(id='data_entered', data=False),
-    html.Div("Everything has been stored correctly.", id="success_message", hidden=True),
     dcc.Store(id="display_results", data=False),
     dcc.Store(id="is_returning_user", data=False),
     html.Br(),
@@ -182,8 +181,7 @@ def return_user(n_clicks):
     return True, False
 
 @app.callback(
-    [dash.dependencies.Output('success_message', "hidden"),
-     dash.dependencies.Output('display_results', "data")],
+    dash.dependencies.Output('display_results', "data"),
     [dash.dependencies.Input('button', 'n_clicks')],
     # this list below will create the ordered args into our callback to
     # collect all the form inputs
@@ -205,7 +203,7 @@ def enter_word(
         ):
     if not n_clicks or n_clicks == 0:
         # don't return anything initially
-        return True, False
+        return False
     required_inputs = {
         "required_singletons": {
             "User Name": user_name,
@@ -216,7 +214,7 @@ def enter_word(
             "Soup": soup
         }
     }
-    return False, True
+    return True
 
 @app.callback(
     [dash.dependencies.Output('view_results', "hidden"),
