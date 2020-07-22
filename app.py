@@ -62,13 +62,14 @@ app.layout = html.Div(children=[
                 required=True)
         ),
         html.Br(),
-        html.H5("What is your current body temperature?"),
+        html.H5("What is your current body temperature in Fahrenheit?"),
         html.Div(id='temperature_input', children=
             dcc.Input(
                 id="temperature",
-                placeholder="Enter your current body temperature...",
+                placeholder="Enter your current body temperature in Fahrenheit...",
                 type="number",
                 size="50",
+                min=70,
                 required=True)
         ),
         html.Br(),
